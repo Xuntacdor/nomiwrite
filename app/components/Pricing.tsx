@@ -117,7 +117,7 @@ export default function Pricing() {
               </div>
 
               <a
-                href="/register"
+                href="/upgrade"
                 className="block w-full py-3.5 text-sm font-bold text-center text-blue-700 bg-white rounded-full hover:bg-blue-50 transition-colors mb-7 shadow-xl shadow-blue-900/20"
               >
                 Dùng Premium

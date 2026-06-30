@@ -82,7 +82,7 @@ export default function AppSidebar({ activePath = "/dashboard" }: AppSidebarProp
             <div className="mt-1.5 h-1 bg-slate-700 rounded-full overflow-hidden">
               <div className="h-full w-3/5 bg-blue-500 rounded-full" />
             </div>
-            <a href="/pricing" className="block mt-2 text-[11px] font-semibold text-blue-400 hover:text-blue-300">
+            <a href="/upgrade" className="block mt-2 text-[11px] font-semibold text-blue-400 hover:text-blue-300">
               Nâng cấp Premium →
             </a>
           </div>
