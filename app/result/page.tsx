@@ -82,6 +82,7 @@ const vocabSuggestions = [
 
 export default function ResultPage() {
   const [sub, setSub] = useState<Submission | null>(null);
+  const [essayExpanded, setEssayExpanded] = useState(false);
 
   useEffect(() => {
     try {
@@ -198,6 +199,30 @@ export default function ResultPage() {
             Điểm AI chấm chỉ mang tính tham khảo và có thể lệch so với điểm thi thật. Kết quả thực tế phụ thuộc vào giám khảo IELTS.
           </p>
         </div>
+
+        {/* Full essay viewer */}
+        {sub?.content && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <button
+              onClick={() => setEssayExpanded(v => !v)}
+              className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <h3 className="text-sm font-extrabold text-slate-900">Bài viết đã nộp</h3>
+                <span className="text-xs text-slate-500 font-medium">{wordCount} từ</span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${essayExpanded ? "rotate-180" : ""}`} />
+            </button>
+            {essayExpanded && (
+              <div className="px-5 pb-5 border-t border-slate-50">
+                <div className="mt-4 border border-slate-100 rounded-xl p-4 bg-slate-50/50 max-h-80 overflow-y-auto">
+                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{sub.content}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Grammar errors */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">

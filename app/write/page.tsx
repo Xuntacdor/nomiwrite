@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import AppShell from "../components/AppShell";
+import GuideModal from "../components/GuideModal";
 import {
   ChevronDown,
   Shuffle,
@@ -15,6 +16,8 @@ import {
   CheckSquare,
   Check,
   Circle,
+  Zap,
+  ExternalLink,
 } from "lucide-react";
 
 const writingTypes = [
@@ -177,7 +180,138 @@ const coachData: Record<string, {
   },
 };
 
-type CoachTab = "structure" | "connectors" | "checklist";
+type CoachTab = "structure" | "connectors" | "checklist" | "suggestions";
+
+interface Suggestion {
+  id: string;
+  type: "error" | "warning" | "tip" | "good";
+  title: string;
+  desc: string;
+  fix?: string;
+}
+
+function analyzeSuggestions(content: string, type: string): Suggestion[] {
+  const trimmed = content.trim();
+  if (!trimmed) return [];
+  const words = trimmed.split(/\s+/);
+  const wordCount = words.length;
+  if (wordCount < 5) return [];
+  const results: Suggestion[] = [];
+
+  // Contractions
+  if (/\b(don't|can't|won't|isn't|aren't|wasn't|weren't|hasn't|haven't|it's|that's|I'm|I've|I'd|I'll|you're|they're|we're)\b/i.test(content)) {
+    results.push({ id: "contractions", type: "error", title: "Có viết tắt (contractions)", desc: "Academic/formal writing không dùng viết tắt", fix: "don't → do not · can't → cannot · it's → it is" });
+  }
+
+  // Informal opinion phrases
+  if (/\bI think\b/i.test(content)) {
+    results.push({ id: "i-think", type: "error", title: '"I think" quá informal', desc: "Không phù hợp với văn phong học thuật", fix: "I contend · I argue · I maintain · It can be argued that" });
+  }
+  if (/\bI feel\b/i.test(content)) {
+    results.push({ id: "i-feel", type: "error", title: '"I feel" quá cảm xúc', desc: "Nên dùng ngôn ngữ khách quan hơn", fix: "It appears that · Evidence suggests · Research indicates" });
+  }
+
+  // Common colocation errors
+  if (/\bdo efforts\b/i.test(content)) {
+    results.push({ id: "do-efforts", type: "error", title: '"do efforts" sai collocation', desc: "Sai kết hợp từ phổ biến của người Việt", fix: "make efforts" });
+  }
+  if (/\bmake a research\b/i.test(content)) {
+    results.push({ id: "make-research", type: "error", title: '"make a research" sai', desc: "Research là uncountable noun, không có 'a'", fix: "conduct research · carry out research" });
+  }
+  if (/\baccording to my opinion\b/i.test(content)) {
+    results.push({ id: "acc-opinion", type: "error", title: '"according to my opinion" thừa từ', desc: "According to + opinion là redundant", fix: "In my opinion · I contend that · I argue that" });
+  }
+  if (/\bmake a harm\b/i.test(content)) {
+    results.push({ id: "make-harm", type: "error", title: '"make a harm" sai collocation', desc: "Sai kết hợp từ", fix: "cause harm · do harm" });
+  }
+
+  // Weak words (limit to max 2 warnings from this group)
+  const weakWordChecks: [RegExp, string, string][] = [
+    [/\bvery\s+(good|bad|important|useful|big|small|large|difficult|easy)\b/gi, "very + adj", "Dùng từ mạnh hơn: crucial, essential, significant, detrimental, beneficial"],
+    [/\bgood\b/gi, "good", "beneficial · effective · valuable · advantageous · favourable"],
+    [/\bbad\b/gi, "bad", "detrimental · harmful · adverse · damaging · unfavourable"],
+    [/\ba lot of\b/gi, "a lot of", "numerous · a wide range of · substantial · considerable"],
+    [/\blots of\b/gi, "lots of", "numerous · a myriad of · a considerable number of"],
+    [/\bnice\b/gi, "nice", "commendable · favourable · beneficial · admirable"],
+    [/\bshow\b/gi, "show", "demonstrate · illustrate · indicate · reveal · highlight"],
+    [/\buse\b/gi, "use", "utilise · employ · implement · apply"],
+    [/\bget\b/gi, "get", "obtain · acquire · achieve · attain · gain"],
+    [/\bbig\b/gi, "big", "substantial · significant · considerable · extensive"],
+  ];
+  let warningCount = 0;
+  for (const [regex, word, fix] of weakWordChecks) {
+    if (warningCount >= 2) break;
+    if (regex.test(content) && !results.find(r => r.id === `weak-${word}`)) {
+      results.push({ id: `weak-${word}`, type: "warning", title: `"${word}" có thể thay thế`, desc: "Dùng từ học thuật hơn để tăng Lexical Resource score", fix });
+      warningCount++;
+    }
+  }
+
+  // Ordinal connector overuse
+  if (/\bFirstly\b/i.test(content) && /\bSecondly\b/i.test(content)) {
+    results.push({ id: "ordinal", type: "warning", title: "Firstly/Secondly có thể repetitive", desc: "Examiner thích logical connectors hơn ordinal connectors", fix: "Furthermore · Moreover · In addition · Subsequently · As a result" });
+  }
+
+  // Word repetition
+  const stopWords = new Set(["the","a","an","and","or","but","in","on","at","to","for","of","with","is","are","was","were","be","been","have","has","had","do","does","did","will","would","could","should","may","might","that","this","it","they","we","i","my","our","their","its","from","by","as","not","so","if","then","than","when","which","who","can","also","about","more","some","there","this","these","those","both","each","all","very","just","more","most","such","even","only","also"]);
+  const freq: Record<string, number> = {};
+  words.forEach(w => {
+    const c = w.replace(/[^a-zA-Z]/g, "").toLowerCase();
+    if (c.length > 4 && !stopWords.has(c)) freq[c] = (freq[c] || 0) + 1;
+  });
+  const repeated = Object.entries(freq).filter(([, n]) => n >= 4).sort((a, b) => b[1] - a[1]);
+  if (repeated.length > 0) {
+    const [w, n] = repeated[0];
+    results.push({ id: "repetition", type: "warning", title: `"${w}" lặp ${n} lần`, desc: "Đa dạng từ vựng giúp tăng điểm Lexical Resource", fix: `Tìm synonym của "${w}" để thay thế` });
+  }
+
+  // Structure tips (context-specific)
+  const hasConclusion = /\b(in conclusion|to conclude|to summarise|to summarize|overall,|in summary|all things considered)\b/i.test(content);
+  const hasConnector = /\b(furthermore|moreover|in addition|however|nevertheless|on the other hand|additionally|consequently|therefore|thus|as a result|in contrast)\b/i.test(content);
+  const hasExample = /\b(for example|for instance|such as|a case in point|as evidence|as an illustration|to illustrate)\b/i.test(content);
+  const hasThesis = /\b(i (contend|argue|maintain|believe|assert)|it (is|can be) argued|this essay (will|aims)|the purpose)\b/i.test(content);
+
+  if (["ielts2", "vstep", "academic"].includes(type)) {
+    if (wordCount > 150 && !hasConclusion) {
+      results.push({ id: "no-conclusion", type: "tip", title: "Chưa có đoạn kết luận", desc: wordCount > 220 ? "Bài đã đủ dài — nên bắt đầu viết kết luận" : "Chuẩn bị đoạn kết luận khi gần xong", fix: "In conclusion, · To summarise, · Overall, …" });
+    }
+    if (wordCount > 80 && !hasConnector) {
+      results.push({ id: "no-connectors", type: "tip", title: "Thiếu cohesive devices", desc: "Từ nối giúp tăng Coherence & Cohesion score", fix: "Furthermore, · However, · Moreover, · In addition," });
+    }
+    if (wordCount > 80 && !hasExample) {
+      results.push({ id: "no-example", type: "tip", title: "Chưa có ví dụ cụ thể", desc: "Ví dụ cụ thể hỗ trợ luận điểm và tăng điểm Task Achievement", fix: "For example, · For instance, · A case in point is …" });
+    }
+  }
+
+  if (["email", "cover"].includes(type) && wordCount > 30 && !hasThesis) {
+    results.push({ id: "no-purpose", type: "tip", title: "Chưa nêu mục đích rõ ràng", desc: "Email/Cover letter cần nêu mục đích ngay từ đầu", fix: "I am writing to … · The purpose of this letter is …" });
+  }
+
+  // Word count tip
+  const minWords: Record<string, number> = { ielts2: 250, ielts1: 150, vstep: 200, email: 100, cover: 250, academic: 300 };
+  const min = minWords[type] || 200;
+  if (wordCount < min * 0.5 && wordCount > 5) {
+    results.push({ id: "word-low", type: "tip", title: `Cần thêm ~${min - wordCount} từ nữa`, desc: `Yêu cầu tối thiểu ${min} từ — hiện tại ${wordCount} từ`, fix: "Phát triển thêm ví dụ và lý lẽ ở body paragraphs" });
+  }
+
+  // Positive feedback
+  if (wordCount >= min) {
+    results.push({ id: "word-ok", type: "good", title: "Đủ độ dài yêu cầu!", desc: `${wordCount} từ — đã vượt mức tối thiểu ${min} từ` });
+  }
+  if (hasExample && ["ielts2", "vstep", "academic"].includes(type)) {
+    results.push({ id: "has-example", type: "good", title: "Có ví dụ cụ thể", desc: "Tốt! Ví dụ giúp support argument hiệu quả hơn" });
+  }
+  if (hasConnector && wordCount > 80) {
+    results.push({ id: "has-connectors", type: "good", title: "Có cohesive devices", desc: "Tốt! Từ nối giúp tăng Coherence & Cohesion score" });
+  }
+  if (hasConclusion && ["ielts2", "vstep", "academic"].includes(type)) {
+    results.push({ id: "has-conclusion", type: "good", title: "Có đoạn kết luận", desc: "Tốt! Bài có cấu trúc đầy đủ" });
+  }
+
+  // Sort: errors first, then warnings, tips, good. Max 7.
+  const order: Record<string, number> = { error: 0, warning: 1, tip: 2, good: 3 };
+  return results.sort((a, b) => order[a.type] - order[b.type]).slice(0, 7);
+}
 
 function WriteContent() {
   const router = useRouter();
@@ -191,6 +325,19 @@ function WriteContent() {
   const [timerOn, setTimerOn] = useState(false);
   const [coachTab, setCoachTab] = useState<CoachTab>("structure");
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  useEffect(() => {
+    if (!content.trim()) { setSuggestions([]); setAnalyzing(false); return; }
+    setAnalyzing(true);
+    const timer = setTimeout(() => {
+      setSuggestions(analyzeSuggestions(content, selectedType));
+      setAnalyzing(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [content, selectedType]);
 
   const currentType = writingTypes.find(t => t.id === selectedType)!;
   const currentTopics = topics[selectedType] || [];
@@ -227,6 +374,8 @@ function WriteContent() {
       return next;
     });
   };
+
+  const errorCount = suggestions.filter(s => s.type === "error").length;
 
   return (
     <AppShell activePath="/write">
@@ -298,10 +447,10 @@ function WriteContent() {
                 <button
                   key={topic}
                   onClick={() => setSelectedTopic(topic)}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all ${
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
                     selectedTopic === topic
-                      ? "bg-blue-50 text-blue-700 font-semibold border border-blue-200"
-                      : "text-slate-600 hover:bg-slate-50 border border-transparent"
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   {topic}
@@ -309,24 +458,22 @@ function WriteContent() {
               ))}
             </div>
           </div>
+
         </div>
 
         {/* Col 2: Editor */}
         <div className="lg:col-span-6 space-y-3">
-          <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
-            <div className="flex items-start gap-2.5">
-              <div className="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                <AlignLeft className="w-3 h-3 text-slate-500" />
+          {currentPrompt && (
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <AlignLeft className="w-3.5 h-3.5 text-amber-600" />
+                <span className="text-[10px] font-extrabold text-amber-700 uppercase tracking-widest">Đề bài</span>
               </div>
-              <div>
-                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Đề bài</p>
-                <p className="text-sm text-slate-700 leading-relaxed">{currentPrompt}</p>
-              </div>
+              <p className="text-[11px] text-amber-900 leading-relaxed">{currentPrompt}</p>
             </div>
-          </div>
-
+          )}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-slate-50 flex items-center justify-between">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-50">
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Bài viết của bạn</span>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-20 bg-slate-100 rounded-full overflow-hidden">
@@ -370,9 +517,18 @@ function WriteContent() {
         {/* Col 3: AI Coach */}
         <div className="lg:col-span-3 space-y-3">
           <div className="bg-gradient-to-br from-blue-600 to-violet-600 rounded-2xl p-4 text-white">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-4 h-4 text-blue-200" />
-              <span className="text-xs font-extrabold text-blue-100 uppercase tracking-widest">AI Coach</span>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-200" />
+                <span className="text-xs font-extrabold text-blue-100 uppercase tracking-widest">AI Coach</span>
+              </div>
+              <button
+                onClick={() => setGuideOpen(true)}
+                className="flex items-center gap-1 text-[10px] font-bold text-blue-100 hover:text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded-lg transition-all"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Hướng dẫn
+              </button>
             </div>
             <p className="text-sm font-bold">{currentType.label}</p>
             <p className="text-[11px] text-blue-200 mt-0.5">Tối thiểu {coach.minWords} từ</p>
@@ -381,14 +537,15 @@ function WriteContent() {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="flex border-b border-slate-100">
               {([
-                { key: "structure",  icon: List,          label: "Cấu trúc" },
-                { key: "connectors", icon: MessageSquare, label: "Từ nối" },
-                { key: "checklist",  icon: CheckSquare,   label: "Checklist" },
+                { key: "structure",   icon: List,          label: "Cấu trúc" },
+                { key: "connectors",  icon: MessageSquare, label: "Từ nối"   },
+                { key: "checklist",   icon: CheckSquare,   label: "Check"    },
+                { key: "suggestions", icon: Zap,           label: "Gợi ý"    },
               ] as { key: CoachTab; icon: typeof List; label: string }[]).map(({ key, icon: Icon, label }) => (
                 <button
                   key={key}
                   onClick={() => setCoachTab(key)}
-                  className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-[10px] font-bold uppercase tracking-wide transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-[10px] font-bold uppercase tracking-wide transition-all relative ${
                     coachTab === key
                       ? "bg-blue-50 text-blue-600 border-b-2 border-blue-500"
                       : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
@@ -396,6 +553,11 @@ function WriteContent() {
                 >
                   <Icon className="w-3 h-3" />
                   {label}
+                  {key === "suggestions" && errorCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-extrabold flex items-center justify-center leading-none">
+                      {errorCount}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -447,11 +609,13 @@ function WriteContent() {
                       <button
                         key={item}
                         onClick={() => toggleCheck(item)}
-                        className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl border transition-all text-left ${
-                          done ? "bg-emerald-50 border-emerald-200" : "bg-slate-50 border-slate-100 hover:border-slate-200"
+                        className={`w-full flex items-start gap-2 text-left px-2.5 py-2 rounded-xl border transition-all ${
+                          done ? "bg-emerald-50 border-emerald-100" : "bg-slate-50 border-slate-100 hover:border-slate-200"
                         }`}
                       >
-                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${done ? "bg-emerald-500" : "border-2 border-slate-300"}`}>
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 transition-all ${
+                          done ? "bg-emerald-500" : "bg-white border-2 border-slate-200"
+                        }`}>
                           {done ? <Check className="w-2.5 h-2.5 text-white" /> : <Circle className="w-2 h-2 text-slate-300" />}
                         </div>
                         <span className={`text-[11px] leading-snug font-medium ${done ? "text-emerald-700 line-through" : "text-slate-600"}`}>
@@ -465,10 +629,70 @@ function WriteContent() {
                   </p>
                 </div>
               )}
+
+              {coachTab === "suggestions" && (
+                <div className="space-y-2">
+                  {analyzing ? (
+                    <div className="flex items-center justify-center py-8 gap-1.5">
+                      {[0, 150, 300].map(delay => (
+                        <div
+                          key={delay}
+                          className="w-2 h-2 rounded-full bg-blue-400 animate-bounce"
+                          style={{ animationDelay: `${delay}ms` }}
+                        />
+                      ))}
+                    </div>
+                  ) : suggestions.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <Zap className="w-7 h-7 text-slate-200 mx-auto mb-2" />
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        Bắt đầu viết để nhận<br />gợi ý real-time từ AI Coach
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {suggestions.map(s => {
+                        const style = {
+                          error:   { border: "border-red-200",    bg: "bg-red-50",     dot: "bg-red-500",     title: "text-red-800",    badge: "bg-red-100 text-red-600"    },
+                          warning: { border: "border-orange-200", bg: "bg-orange-50",  dot: "bg-orange-400",  title: "text-orange-800", badge: "bg-orange-100 text-orange-600"},
+                          tip:     { border: "border-blue-200",   bg: "bg-blue-50",    dot: "bg-blue-400",    title: "text-blue-800",   badge: "bg-blue-100 text-blue-600"  },
+                          good:    { border: "border-emerald-200",bg: "bg-emerald-50", dot: "bg-emerald-500", title: "text-emerald-800",badge: "bg-emerald-100 text-emerald-600"},
+                        }[s.type];
+                        const label = { error: "Lỗi", warning: "Cải thiện", tip: "Gợi ý", good: "Tốt" }[s.type];
+                        return (
+                          <div key={s.id} className={`border ${style.border} ${style.bg} rounded-xl p-3`}>
+                            <div className="flex items-start gap-2">
+                              <div className={`w-2 h-2 rounded-full ${style.dot} mt-1.5 shrink-0`} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                                  <span className={`text-[9px] font-extrabold uppercase tracking-wide px-1.5 py-0.5 rounded ${style.badge}`}>{label}</span>
+                                  <span className={`text-[11px] font-bold ${style.title} leading-tight`}>{s.title}</span>
+                                </div>
+                                <p className="text-[10px] text-slate-500 leading-snug">{s.desc}</p>
+                                {s.fix && (
+                                  <p className="text-[10px] text-slate-600 mt-1 font-medium leading-snug">→ {s.fix}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <p className="text-[10px] text-slate-400 text-center pt-1">
+                        Phân tích dựa trên {wordCount} từ
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+      <GuideModal
+        typeId={guideOpen ? selectedType : null}
+        onClose={() => setGuideOpen(false)}
+        hideCTA
+      />
     </AppShell>
   );
 }

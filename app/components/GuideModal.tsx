@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AppShell from "../components/AppShell";
 import {
   BookOpen, Briefcase, GraduationCap, FileText, Mail, Star,
-  ChevronRight, Copy, Check, Lightbulb, AlertTriangle, AlignLeft,
-  MessageSquare, Zap, Target, Clock, ArrowRight, X,
+  Copy, Check, Lightbulb, AlertTriangle, AlignLeft,
+  MessageSquare, Zap, Clock, ArrowRight, X, Target,
 } from "lucide-react";
 
 type Tab = "structure" | "connectors" | "tips" | "mistakes";
@@ -16,7 +15,6 @@ const types = [
     gradient: "from-blue-500 to-indigo-600", gradientLight: "from-blue-50 to-indigo-50",
     accent: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", pill: "bg-blue-100 text-blue-700",
     tag: "IELTS", label: "IELTS Writing Task 2",
-    desc: "Bài luận phân tích quan điểm, thảo luận hai chiều hoặc đề xuất giải pháp cho vấn đề xã hội.",
     minWords: 250, time: "40 phút",
     criteria: [
       { label: "Task Response",        weight: "25%", tip: "Address đầy đủ đề bài, quan điểm rõ ràng và nhất quán" },
@@ -60,7 +58,6 @@ const types = [
     gradient: "from-violet-500 to-purple-600", gradientLight: "from-violet-50 to-purple-50",
     accent: "text-violet-600", bg: "bg-violet-50", border: "border-violet-200", pill: "bg-violet-100 text-violet-700",
     tag: "IELTS", label: "IELTS Writing Task 1",
-    desc: "Mô tả và phân tích dữ liệu từ biểu đồ, bảng biểu, sơ đồ hoặc quy trình.",
     minWords: 150, time: "20 phút",
     criteria: [
       { label: "Task Achievement",     weight: "25%", tip: "Có overview, select key features, không liệt kê mọi số liệu" },
@@ -104,7 +101,6 @@ const types = [
     gradient: "from-emerald-500 to-teal-600", gradientLight: "from-emerald-50 to-teal-50",
     accent: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", pill: "bg-emerald-100 text-emerald-700",
     tag: "VSTEP", label: "VSTEP Writing",
-    desc: "Bài luận tiếng Anh học thuật theo định dạng kỳ thi VSTEP của Việt Nam.",
     minWords: 200, time: "35 phút",
     criteria: [
       { label: "Nội dung & Ý tưởng", weight: "40%", tip: "Thesis rõ, luận điểm đủ và relevant, có dẫn chứng" },
@@ -147,7 +143,6 @@ const types = [
     gradient: "from-orange-500 to-amber-500", gradientLight: "from-orange-50 to-amber-50",
     accent: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", pill: "bg-orange-100 text-orange-700",
     tag: "Workplace", label: "Email công việc",
-    desc: "Email tiếng Anh chuyên nghiệp dùng trong môi trường công sở: xin việc, đề xuất, phản hồi.",
     minWords: 100, time: "10–15 phút",
     criteria: [
       { label: "Mục đích rõ ràng",   weight: "30%", tip: "Người đọc hiểu ngay bạn cần gì sau câu đầu tiên" },
@@ -191,7 +186,6 @@ const types = [
     gradient: "from-pink-500 to-rose-600", gradientLight: "from-pink-50 to-rose-50",
     accent: "text-pink-600", bg: "bg-pink-50", border: "border-pink-200", pill: "bg-pink-100 text-pink-700",
     tag: "Career", label: "Cover Letter / Luận học bổng",
-    desc: "Thư xin việc hoặc bài luận học bổng thể hiện động lực, kinh nghiệm và sự phù hợp.",
     minWords: 250, time: "30–60 phút",
     criteria: [
       { label: "Hook & First impression", weight: "25%", tip: "Câu đầu tiên phải khiến reader muốn đọc tiếp — không bắt đầu bằng 'My name is'" },
@@ -202,7 +196,7 @@ const types = [
     structure: [
       { step: "Hook",       detail: "Câu mở ấn tượng: thành tích, tình huống — KHÔNG phải 'My name is'", example: "When I led a cross-functional team of 8 to deliver a product that reached 50,000 users in 3 months, I realised that scaling impact is what drives me." },
       { step: "Background", detail: "2–3 kinh nghiệm liên quan TRỰC TIẾP, kèm số liệu", example: "During my 3 years at XYZ Corp, I grew our social media engagement by 120% and managed a quarterly budget of $50,000." },
-      { step: "Motivation", detail: "Tại sao vị trí NÀY + tại sao CÔNG TY/TRƯỜNG NÀY — phải cụ thể", example: "I am drawn to Anthropic specifically because of your Constitutional AI research — I believe safety-first AI development is the only sustainable path forward." },
+      { step: "Motivation", detail: "Tại sao vị trí NÀY + tại sao CÔNG TY/TRƯỜNG NÀY — phải cụ thể", example: "I am drawn to this company specifically because of your Constitutional AI research — I believe safety-first AI development is the only sustainable path forward." },
       { step: "Value fit",  detail: "Bạn đem lại gì cụ thể — không chung chung 'I am hardworking'", example: "I would bring proven experience in rapid experimentation cycles and a network of 200+ engineers in the fintech space." },
       { step: "Closing",    detail: "Chủ động bày tỏ mong muốn — không thụ động 'Hope to hear from you'", example: "I would welcome the opportunity to discuss how my background aligns with your goals. I am available for an interview at your earliest convenience." },
     ],
@@ -222,7 +216,7 @@ const types = [
     mistakes: [
       { wrong: "I am a hardworking, dedicated, and passionate person who loves challenges.", fix: "In my previous role, I led a 5-person team to deliver the project 2 weeks ahead of schedule — an achievement that required both strategic planning and adaptability under pressure.", note: "Adjectives tự mô tả không có giá trị — chỉ có evidence mới thuyết phục." },
       { wrong: "I am writing to apply for the Software Engineer position at your esteemed company.", fix: "When our startup's infrastructure failed during peak traffic, I rebuilt the backend architecture in 48 hours — keeping 10,000 users online and earning the trust of our CTO.", note: "Câu mở generic = first impression kém. Hook = story/achievement = memorable." },
-      { wrong: "I believe I am a good fit for this position and would love to join your team.", fix: "With 3 years of React experience and a track record of shipping products used by 200K+ users, I am confident I can contribute meaningfully to [Company]'s engineering team from day one.", note: "Vague belief vs. specific evidence — luôn chọn evidence." },
+      { wrong: "I believe I am a good fit for this position and would love to join your team.", fix: "With 3 years of React experience and a track record of shipping products used by 200K+ users, I am confident I can contribute meaningfully to the engineering team from day one.", note: "Vague belief vs. specific evidence — luôn chọn evidence." },
     ],
     bandTips: [
       { band: "Trung bình", color: "bg-orange-100 text-orange-700", req: "Có đủ các phần, nhưng generic — không đề cập tên công ty, không có số liệu." },
@@ -235,7 +229,6 @@ const types = [
     gradient: "from-slate-600 to-slate-800", gradientLight: "from-slate-50 to-slate-100",
     accent: "text-slate-600", bg: "bg-slate-50", border: "border-slate-200", pill: "bg-slate-100 text-slate-700",
     tag: "Academic", label: "Văn bản học thuật",
-    desc: "Bài báo, tiểu luận, research paper theo chuẩn học thuật quốc tế.",
     minWords: 300, time: "Linh hoạt",
     criteria: [
       { label: "Research question",    weight: "25%", tip: "Câu hỏi nghiên cứu rõ ràng, thesis trả lời được câu hỏi đó" },
@@ -284,23 +277,23 @@ const tabDefs: { key: Tab; icon: typeof AlignLeft; label: string }[] = [
   { key: "mistakes",   icon: AlertTriangle, label: "Lỗi hay gặp" },
 ];
 
-export default function GuidePage() {
-  const [selected, setSelected] = useState<string | null>(null);
+interface GuideModalProps {
+  typeId: string | null;
+  onClose: () => void;
+  hideCTA?: boolean;
+}
+
+export default function GuideModal({ typeId, onClose, hideCTA }: GuideModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>("structure");
   const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const openParam = params.get("open");
-    if (openParam && types.find(t => t.id === openParam)) {
-      setSelected(openParam);
-      setActiveTab("structure");
-    }
-  }, []);
+    if (typeId) setActiveTab("structure");
+  }, [typeId]);
 
-  const openType = types.find(t => t.id === selected);
-  const open = (id: string) => { setSelected(id); setActiveTab("structure"); };
-  const close = () => setSelected(null);
+  const openType = types.find(t => t.id === typeId);
+  if (!openType) return null;
+
   const copyPhrase = (phrase: string) => {
     navigator.clipboard?.writeText(phrase);
     setCopied(phrase);
@@ -308,261 +301,178 @@ export default function GuidePage() {
   };
 
   return (
-    <AppShell activePath="/guide">
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-slate-100 px-6 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="w-4 h-4 text-blue-500" />
-          <h1 className="text-sm font-extrabold text-slate-900">Hướng dẫn viết</h1>
-        </div>
-        <span className="text-xs text-slate-400">{types.length} loại văn bản</span>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
 
-      <div className="p-6 w-full space-y-6">
-        {/* Hero */}
-        <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-violet-600 to-purple-700" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.08),transparent_60%)]" />
-          <div className="relative p-7 flex flex-col sm:flex-row items-start sm:items-center gap-8">
-            <div className="flex-1">
-              <p className="text-[11px] font-extrabold text-blue-200 uppercase tracking-widest mb-2">AI Writing Coach</p>
-              <h2 className="text-2xl font-extrabold text-white mb-2 leading-tight">Học cách viết từng loại văn bản</h2>
-              <p className="text-sm text-blue-100 leading-relaxed max-w-xl">
-                Bấm vào loại văn bản để xem cấu trúc chi tiết, từ nối có thể copy ngay, mẹo viết có giải thích "tại sao", và ví dụ before/after từ AI Coach.
-              </p>
-            </div>
-            <div className="flex gap-4 shrink-0">
-              {([
-                { val: "6",   label: "Loại văn bản", icon: FileText     },
-                { val: "50+", label: "Từ nối mẫu",   icon: MessageSquare },
-                { val: "25+", label: "Mẹo viết",     icon: Lightbulb    },
-              ] as const).map(({ val, label, icon: Icon }) => (
-                <div key={label} className="bg-white/10 border border-white/15 rounded-2xl p-4 text-center min-w-[70px]">
-                  <Icon className="w-4 h-4 text-blue-200 mx-auto mb-1.5" />
-                  <p className="text-xl font-extrabold text-white">{val}</p>
-                  <p className="text-[10px] text-blue-200 font-semibold leading-tight mt-0.5">{label}</p>
+        {/* Header */}
+        <div className={`bg-gradient-to-r ${openType.gradientLight} border-b border-slate-100 p-5 shrink-0`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${openType.gradient} flex items-center justify-center shadow-md shrink-0`}>
+                {(() => { const Icon = openType.icon; return <Icon className="w-5 h-5 text-white" />; })()}
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <h2 className="text-sm font-extrabold text-slate-900">{openType.label}</h2>
+                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${openType.pill}`}>{openType.tag}</span>
                 </div>
-              ))}
+                <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{openType.time}</span>
+                  <span className="w-px h-3 bg-slate-200" />
+                  <span className="flex items-center gap-1"><Target className="w-3 h-3" />≥ {openType.minWords} từ</span>
+                </div>
+              </div>
             </div>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/80 border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-white hover:text-slate-600 transition-all shrink-0">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {openType.criteria.map((c) => (
+              <div key={c.label} title={c.tip} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/70 border border-white/80 rounded-xl cursor-help hover:bg-white transition-colors">
+                <span className={`text-[10px] font-extrabold ${openType.accent}`}>{c.weight}</span>
+                <span className="text-[10px] font-semibold text-slate-600">{c.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Card grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {types.map((t) => {
-            const Icon = t.icon;
-            return (
-              <button key={t.id} onClick={() => open(t.id)}
-                className="group text-left bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 overflow-hidden"
-              >
-                <div className={`h-1.5 w-full bg-gradient-to-r ${t.gradient}`} />
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center shadow-sm`}>
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className={`text-[10px] font-extrabold px-2 py-1 rounded-full uppercase tracking-wide ${t.pill}`}>{t.tag}</span>
-                  </div>
-                  <h3 className="text-sm font-extrabold text-slate-900 mb-1">{t.label}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed mb-4">{t.desc}</p>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 mb-4">
-                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{t.time}</span>
-                    <span className="w-px h-3 bg-slate-200" />
-                    <span className="flex items-center gap-1"><Target className="w-3.5 h-3.5" />≥ {t.minWords} từ</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 flex-wrap mb-4">
-                    {t.structure.map((s, i) => (
-                      <span key={i} className={`text-[10px] font-semibold px-2 py-1 rounded-lg ${t.bg} border ${t.border} ${t.accent}`}>{s.step}</span>
-                    ))}
-                  </div>
-                  <div className={`flex items-center gap-1.5 text-xs font-bold ${t.accent} group-hover:gap-2.5 transition-all`}>
-                    Xem hướng dẫn chi tiết <ChevronRight className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+        {/* Tabs */}
+        <div className="flex border-b border-slate-100 bg-slate-50/50 shrink-0">
+          {tabDefs.map(({ key, icon: TabIcon, label }) => (
+            <button key={key} onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-1.5 px-4 py-3 text-xs font-bold transition-all border-b-2 ${
+                activeTab === key ? `border-current ${openType.accent} bg-white` : "border-transparent text-slate-400 hover:text-slate-600 hover:bg-white/60"
+              }`}
+            >
+              <TabIcon className="w-3.5 h-3.5" />{label}
+            </button>
+          ))}
         </div>
 
-        <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-2xl">
-          <Zap className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-          <p className="text-xs text-blue-700 leading-relaxed">
-            <span className="font-bold">Mẹo dùng AI Coach:</span> Khi viết bài, mở tab <span className="font-bold">Cấu trúc / Từ nối / Checklist</span> trong panel bên phải để xem hướng dẫn ngay trong lúc viết.
-          </p>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {openType && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={close} />
-          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden">
-
-            {/* Modal header */}
-            <div className={`bg-gradient-to-r ${openType.gradientLight} border-b border-slate-100 p-5 shrink-0`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${openType.gradient} flex items-center justify-center shadow-md shrink-0`}>
-                    {(() => { const Icon = openType.icon; return <Icon className="w-5 h-5 text-white" />; })()}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h2 className="text-sm font-extrabold text-slate-900">{openType.label}</h2>
-                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${openType.pill}`}>{openType.tag}</span>
+        {/* Content */}
+        <div className="overflow-y-auto flex-1 p-5">
+          {activeTab === "structure" && (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                {openType.structure.map((s, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <div className={`w-7 h-7 rounded-xl bg-gradient-to-br ${openType.gradient} text-white text-[11px] font-extrabold flex items-center justify-center shrink-0 shadow-sm`}>{i + 1}</div>
+                      {i < openType.structure.length - 1 && <div className="w-px flex-1 bg-slate-100 min-h-[16px]" />}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{openType.time}</span>
-                      <span className="w-px h-3 bg-slate-200" />
-                      <span className="flex items-center gap-1"><Target className="w-3 h-3" />≥ {openType.minWords} từ</span>
+                    <div className="pb-3 flex-1">
+                      <div className="flex items-baseline gap-2 mb-1.5">
+                        <p className="text-sm font-extrabold text-slate-900">{s.step}</p>
+                        <p className="text-xs text-slate-500">{s.detail}</p>
+                      </div>
+                      <div className={`p-3 rounded-xl ${openType.bg} border ${openType.border}`}>
+                        <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Ví dụ mẫu</p>
+                        <p className={`text-xs ${openType.accent} font-medium italic leading-relaxed`}>&ldquo;{s.example}&rdquo;</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <button onClick={close} className="w-8 h-8 rounded-full bg-white/80 border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-white hover:text-slate-600 transition-all shrink-0">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {openType.criteria.map((c) => (
-                  <div key={c.label} title={c.tip} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/70 border border-white/80 rounded-xl cursor-help hover:bg-white transition-colors">
-                    <span className={`text-[10px] font-extrabold ${openType.accent}`}>{c.weight}</span>
-                    <span className="text-[10px] font-semibold text-slate-600">{c.label}</span>
                   </div>
                 ))}
               </div>
+              <div className="pt-2 border-t border-slate-100">
+                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Zap className="w-3 h-3" />Yêu cầu theo mức điểm</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {openType.bandTips.map((b) => (
+                    <div key={b.band} className={`px-3 py-2.5 rounded-xl ${b.color}`}>
+                      <p className="text-[10px] font-extrabold uppercase tracking-wide mb-1">{b.band}</p>
+                      <p className="text-[11px] leading-snug">{b.req}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+          )}
 
-            {/* Tabs */}
-            <div className="flex border-b border-slate-100 bg-slate-50/50 shrink-0">
-              {tabDefs.map(({ key, icon: TabIcon, label }) => (
-                <button key={key} onClick={() => setActiveTab(key)}
-                  className={`flex items-center gap-1.5 px-4 py-3 text-xs font-bold transition-all border-b-2 ${
-                    activeTab === key ? `border-current ${openType.accent} bg-white` : "border-transparent text-slate-400 hover:text-slate-600 hover:bg-white/60"
-                  }`}
-                >
-                  <TabIcon className="w-3.5 h-3.5" />{label}
-                </button>
-              ))}
-            </div>
-
-            {/* Scrollable content */}
-            <div className="overflow-y-auto flex-1 p-5">
-              {activeTab === "structure" && (
-                <div className="space-y-4">
-                  <div className="space-y-3">
-                    {openType.structure.map((s, i) => (
-                      <div key={i} className="flex gap-4">
-                        <div className="flex flex-col items-center gap-1">
-                          <div className={`w-7 h-7 rounded-xl bg-gradient-to-br ${openType.gradient} text-white text-[11px] font-extrabold flex items-center justify-center shrink-0 shadow-sm`}>{i + 1}</div>
-                          {i < openType.structure.length - 1 && <div className="w-px flex-1 bg-slate-100 min-h-[16px]" />}
-                        </div>
-                        <div className="pb-3 flex-1">
-                          <div className="flex items-baseline gap-2 mb-1.5">
-                            <p className="text-sm font-extrabold text-slate-900">{s.step}</p>
-                            <p className="text-xs text-slate-500">{s.detail}</p>
-                          </div>
-                          <div className={`p-3 rounded-xl ${openType.bg} border ${openType.border}`}>
-                            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">Ví dụ mẫu</p>
-                            <p className={`text-xs ${openType.accent} font-medium italic leading-relaxed`}>&ldquo;{s.example}&rdquo;</p>
-                          </div>
-                        </div>
-                      </div>
+          {activeTab === "connectors" && (
+            <div className="space-y-4">
+              {openType.connectors.map((group) => (
+                <div key={group.label}>
+                  <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{group.label}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {group.phrases.map((phrase) => (
+                      <button key={phrase} onClick={() => copyPhrase(phrase)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                          copied === phrase
+                            ? "bg-emerald-50 border border-emerald-200 text-emerald-700"
+                            : `${openType.bg} border ${openType.border} text-slate-700 hover:shadow-sm`
+                        }`}
+                      >
+                        {copied === phrase ? <><Check className="w-3 h-3" />Đã copy</> : <><Copy className="w-3 h-3 opacity-50" />{phrase}</>}
+                      </button>
                     ))}
                   </div>
-                  <div className="pt-2 border-t border-slate-100">
-                    <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><Zap className="w-3 h-3" />Yêu cầu theo mức điểm</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {openType.bandTips.map((b) => (
-                        <div key={b.band} className={`px-3 py-2.5 rounded-xl ${b.color}`}>
-                          <p className="text-[10px] font-extrabold uppercase tracking-wide mb-1">{b.band}</p>
-                          <p className="text-[11px] leading-snug">{b.req}</p>
-                        </div>
-                      ))}
-                    </div>
+                </div>
+              ))}
+              <p className="text-[10px] text-slate-400 text-center pt-2 flex items-center justify-center gap-1"><Copy className="w-3 h-3" />Bấm vào phrase để copy vào clipboard</p>
+            </div>
+          )}
+
+          {activeTab === "tips" && (
+            <div className="space-y-3">
+              {openType.tips.map((item, i) => (
+                <div key={i} className="flex gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${openType.gradient} flex items-center justify-center shrink-0 mt-0.5 shadow-sm`}>
+                    <Check className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800 mb-1">{item.tip}</p>
+                    <p className="text-xs text-slate-500 leading-relaxed"><span className="font-semibold text-slate-600">Tại sao: </span>{item.why}</p>
                   </div>
                 </div>
-              )}
-
-              {activeTab === "connectors" && (
-                <div className="space-y-4">
-                  {openType.connectors.map((group) => (
-                    <div key={group.label}>
-                      <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{group.label}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {group.phrases.map((phrase) => (
-                          <button key={phrase} onClick={() => copyPhrase(phrase)}
-                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
-                              copied === phrase ? "bg-emerald-50 border border-emerald-200 text-emerald-700" : `${openType.bg} border ${openType.border} text-slate-700 hover:shadow-sm`
-                            }`}
-                          >
-                            {copied === phrase ? <><Check className="w-3 h-3" />Đã copy</> : <><Copy className="w-3 h-3 opacity-50" />{phrase}</>}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                  <p className="text-[10px] text-slate-400 text-center pt-2 flex items-center justify-center gap-1"><Copy className="w-3 h-3" />Bấm vào phrase để copy vào clipboard</p>
-                </div>
-              )}
-
-              {activeTab === "tips" && (
-                <div className="space-y-3">
-                  {openType.tips.map((item, i) => (
-                    <div key={i} className="flex gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                      <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${openType.gradient} flex items-center justify-center shrink-0 mt-0.5 shadow-sm`}>
-                        <Check className="w-3.5 h-3.5 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-800 mb-1">{item.tip}</p>
-                        <p className="text-xs text-slate-500 leading-relaxed"><span className="font-semibold text-slate-600">Tại sao: </span>{item.why}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {activeTab === "mistakes" && (
-                <div className="space-y-4">
-                  {openType.mistakes.map((item, i) => (
-                    <div key={i} className="rounded-2xl border border-slate-100 overflow-hidden">
-                      <div className="flex items-start gap-3 p-4 bg-red-50 border-b border-red-100">
-                        <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <span className="text-red-500 text-[10px] font-extrabold">✕</span>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-extrabold text-red-400 uppercase tracking-widest mb-1">Cách viết kém</p>
-                          <p className="text-sm text-red-700 italic leading-relaxed">&ldquo;{item.wrong}&rdquo;</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3 p-4 bg-emerald-50">
-                        <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <Check className="w-3 h-3 text-emerald-600" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-extrabold text-emerald-500 uppercase tracking-widest mb-1">Cách viết tốt hơn</p>
-                          <p className="text-sm text-emerald-800 font-medium italic leading-relaxed">&ldquo;{item.fix}&rdquo;</p>
-                        </div>
-                      </div>
-                      <div className="px-4 py-2.5 bg-amber-50 border-t border-amber-100 flex items-start gap-2">
-                        <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                        <p className="text-xs text-amber-700 leading-relaxed">{item.note}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
+          )}
 
-            {/* Modal footer */}
-            <div className="shrink-0 px-5 py-4 border-t border-slate-100 flex items-center justify-between bg-white">
-              <button onClick={close} className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors">← Quay lại</button>
-              <a href={`/write?type=${openType.id}`}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r ${openType.gradient} text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-sm`}
-              >
-                Bắt đầu viết loại này <ArrowRight className="w-3.5 h-3.5" />
-              </a>
+          {activeTab === "mistakes" && (
+            <div className="space-y-4">
+              {openType.mistakes.map((item, i) => (
+                <div key={i} className="rounded-2xl border border-slate-100 overflow-hidden">
+                  <div className="flex items-start gap-3 p-4 bg-red-50 border-b border-red-100">
+                    <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-red-500 text-[10px] font-extrabold">✕</span>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-extrabold text-red-400 uppercase tracking-widest mb-1">Cách viết kém</p>
+                      <p className="text-sm text-red-700 italic leading-relaxed">&ldquo;{item.wrong}&rdquo;</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-emerald-50">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-extrabold text-emerald-500 uppercase tracking-widest mb-1">Cách viết tốt hơn</p>
+                      <p className="text-sm text-emerald-800 font-medium italic leading-relaxed">&ldquo;{item.fix}&rdquo;</p>
+                    </div>
+                  </div>
+                  <div className="px-4 py-2.5 bg-amber-50 border-t border-amber-100 flex items-start gap-2">
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700 leading-relaxed">{item.note}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
-      )}
-    </AppShell>
+
+        {/* Footer */}
+        <div className="shrink-0 px-5 py-4 border-t border-slate-100 flex items-center justify-between bg-white">
+          <button onClick={onClose} className="text-xs text-slate-400 hover:text-slate-600 font-semibold transition-colors">← Đóng</button>
+          {!hideCTA && (
+            <a href={`/write?type=${openType.id}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r ${openType.gradient} text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-sm`}
+            >
+              Bắt đầu viết loại này <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
