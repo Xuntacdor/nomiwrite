@@ -95,7 +95,7 @@ export default function ProfilePage() {
               <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-4">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: "60%" }} />
               </div>
-              <a href="/register" className="block w-full py-2.5 text-xs font-bold text-center text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl hover:opacity-90 transition-opacity">
+              <a href="/upgrade" className="block w-full py-2.5 text-xs font-bold text-center text-white bg-gradient-to-r from-blue-600 to-violet-600 rounded-xl hover:opacity-90 transition-opacity">
                 Nâng cấp Premium →
               </a>
             </div>
